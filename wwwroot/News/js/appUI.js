@@ -26,39 +26,39 @@ async function Init_UI() {
         width: $("#sample").outerWidth(),
         height: $("#sample").outerHeight()
     };
-    pageManager = new PageManager('scrollPanel', 'itemsPanel', itemLayout, renderBookmarks);
+    pageManager = new PageManager('scrollPanel', 'itemsPanel', itemLayout, renderNews);
     compileCategories();
-    $('#createBookmark').on("click", async function () {
-        renderCreateBookmarkForm();
+    $('#createNews').on("click", async function () {
+        renderCreateNewsForm();
     });
     $('#abort').on("click", async function () {
-        showBookmarks()
+        showNews()
     });
     $('#aboutCmd').on("click", function () {
         renderAbout();
     });
-    showBookmarks();
+    showNews();
     start_Periodic_Refresh();
 }
-function showBookmarks() {
-    $("#actionTitle").text("Liste des favoris");
+function showNews() {
+    $("#actionTitle").text("Liste de nouvelles");
     $("#scrollPanel").show();
     $('#abort').hide();
-    $('#bookmarkForm').hide();
+    $('#NewsForm').hide();
     $('#aboutContainer').hide();
-    $("#createBookmark").show();
+    $("#createNews").show();
     hold_Periodic_Refresh = false;
 }
-function hideBookmarks() {
+function hideNews() {
     $("#scrollPanel").hide();
-    $("#createBookmark").hide();
+    $("#createNews").hide();
     $("#abort").show();
     hold_Periodic_Refresh = true;
 }
 function start_Periodic_Refresh() {
     setInterval(async () => {
         if (!hold_Periodic_Refresh) {
-            let etag = await Bookmarks_API.HEAD();
+            let etag = await News_API.HEAD();
             if (currentETag != etag) {
                 currentETag = etag;
                 await pageManager.update(false);
@@ -69,7 +69,7 @@ function start_Periodic_Refresh() {
         periodicRefreshPeriod * 1000);
 }
 function renderAbout() {
-    hideBookmarks();
+    hideNews();
     $("#actionTitle").text("À propos...");
     $("#aboutContainer").show();
 }
@@ -101,13 +101,13 @@ function updateDropDownMenu() {
         renderAbout();
     });
     $('#allCatCmd').on("click", function () {
-        showBookmarks();
+        showNews();
         selectedCategory = "";
         updateDropDownMenu();
         pageManager.reset();
     });
     $('.category').on("click", function () {
-        showBookmarks();
+        showNews();
         selectedCategory = $(this).text().trim();
         updateDropDownMenu();
         pageManager.reset();
@@ -115,8 +115,8 @@ function updateDropDownMenu() {
 }
 async function compileCategories() {
     categories = [];
-    let response = await Bookmarks_API.GetQuery("?fields=category&sort=category");
-    if (!Bookmarks_API.error) {
+    let response = await News_API.GetQuery("?fields=category&sort=category");
+    if (!News_API.error) {
         let items = response.data;
         if (items != null) {
             items.forEach(item => {
@@ -127,114 +127,114 @@ async function compileCategories() {
         }
     }
 }
-async function renderBookmarks(queryString) {
+async function renderNews(queryString) {
     let endOfData = false;
     queryString += "&sort=category";
     if (selectedCategory != "") queryString += "&category=" + selectedCategory;
     addWaitingGif();
-    let response = await Bookmarks_API.Get(queryString);
-    if (!Bookmarks_API.error) {
+    let response = await News_API.Get(queryString);
+    if (!News_API.error) {
         currentETag = response.ETag;
-        let Bookmarks = response.data;
-        if (Bookmarks.length > 0) {
-            Bookmarks.forEach(Bookmark => {
-                $("#itemsPanel").append(renderBookmark(Bookmark));
+        let News = response.data;
+        if (News.length > 0) {
+            News.forEach(News => {
+                $("#itemsPanel").append(renderNews(News));
             });
             $(".editCmd").off();
             $(".editCmd").on("click", function () {
-                renderEditBookmarkForm($(this).attr("editBookmarkId"));
+                renderEditNewsForm($(this).attr("editNewsId"));
             });
             $(".deleteCmd").off();
             $(".deleteCmd").on("click", function () {
-                renderDeleteBookmarkForm($(this).attr("deleteBookmarkId"));
+                renderDeleteNewsForm($(this).attr("deleteNewsId"));
             });
         } else
             endOfData = true;
     } else {
-        renderError(Bookmarks_API.currentHttpError);
+        renderError(News_API.currentHttpError);
     }
     removeWaitingGif();
     return endOfData;
 }
 
 function renderError(message) {
-    hideBookmarks();
+    hideNews();
     $("#actionTitle").text("Erreur du serveur...");
     $("#errorContainer").show();
     $("#errorContainer").append($(`<div>${message}</div>`));
 }
-function renderCreateBookmarkForm() {
-    renderBookmarkForm();
+function renderCreateNewsForm() {
+    renderNewsForm();
 }
-async function renderEditBookmarkForm(id) {
+async function renderEditNewsForm(id) {
     addWaitingGif();
-    let response = await Bookmarks_API.Get(id)
-    if (!Bookmarks_API.error) {
-        let Bookmark = response.data;
-        if (Bookmark !== null)
-            renderBookmarkForm(Bookmark);
+    let response = await News_API.Get(id)
+    if (!News_API.error) {
+        let News = response.data;
+        if (News !== null)
+            renderNewsForm(News);
         else
-            renderError("Bookmark introuvable!");
+            renderError("Nouvelle introuvable!");
     } else {
-        renderError(Bookmarks_API.currentHttpError);
+        renderError(News_API.currentHttpError);
     }
     removeWaitingGif();
 }
-async function renderDeleteBookmarkForm(id) {
-    hideBookmarks();
+async function renderDeleteNewsForm(id) {
+    hideNews();
     $("#actionTitle").text("Retrait");
-    $('#bookmarkForm').show();
-    $('#bookmarkForm').empty();
-    let response = await Bookmarks_API.Get(id)
-    if (!Bookmarks_API.error) {
-        let Bookmark = response.data;
-        let favicon = makeFavicon(Bookmark.Url);
-        if (Bookmark !== null) {
-            $("#bookmarkForm").append(`
-        <div class="BookmarkdeleteForm">
-            <h4>Effacer le favori suivant?</h4>
+    $('#newsForm').show();
+    $('#newsForm').empty();
+    let response = await News_API.Get(id)
+    if (!News_API.error) {
+        let News = response.data;
+        let favicon = makeFavicon(News.Url);
+        if (News !== null) {
+            $("#newsForm").append(`
+        <div class="NewsdeleteForm">
+            <h4>Effacer la nouvelle suivante?</h4>
             <br>
-            <div class="BookmarkRow" id=${Bookmark.Id}">
-                <div class="BookmarkContainer noselect">
-                    <div class="BookmarkLayout">
-                        <div class="Bookmark">
-                            <a href="${Bookmark.Url}" target="_blank"> ${favicon} </a>
-                            <span class="BookmarkTitle">${Bookmark.Title}</span>
+            <div class="NewsRow" id=${News.Id}">
+                <div class="NewsContainer noselect">
+                    <div class="NewsLayout">
+                        <div class="News">
+                            <a href="${News.Url}" target="_blank"> ${favicon} </a>
+                            <span class="NewsTitle">${News.Title}</span>
                         </div>
-                        <span class="BookmarkCategory">${Bookmark.Category}</span>
+                        <span class="NewsCategory">${News.Category}</span>
                     </div>
-                    <div class="BookmarkCommandPanel">
-                        <span class="editCmd cmdIcon fa fa-pencil" editBookmarkId="${Bookmark.Id}" title="Modifier ${Bookmark.Title}"></span>
-                        <span class="deleteCmd cmdIcon fa fa-trash" deleteBookmarkId="${Bookmark.Id}" title="Effacer ${Bookmark.Title}"></span>
+                    <div class="NewsCommandPanel">
+                        <span class="editCmd cmdIcon fa fa-pencil" editNewsId="${News.Id}" title="Modifier ${News.Title}"></span>
+                        <span class="deleteCmd cmdIcon fa fa-trash" deleteNewsId="${News.Id}" title="Effacer ${News.Title}"></span>
                     </div>
                 </div>
             </div>   
             <br>
-            <input type="button" value="Effacer" id="deleteBookmark" class="btn btn-primary">
+            <input type="button" value="Effacer" id="deleteNews" class="btn btn-primary">
             <input type="button" value="Annuler" id="cancel" class="btn btn-secondary">
         </div>    
         `);
-            $('#deleteBookmark').on("click", async function () {
-                await Bookmarks_API.Delete(Bookmark.Id);
-                if (!Bookmarks_API.error) {
-                    showBookmarks();
+            $('#deleteNews').on("click", async function () {
+                await News_API.Delete(News.Id);
+                if (!News_API.error) {
+                    showNews();
                     await pageManager.update(false);
                     compileCategories();
                 }
                 else {
-                    console.log(Bookmarks_API.currentHttpError)
+                    console.log(News_API.currentHttpError)
                     renderError("Une erreur est survenue!");
                 }
             });
             $('#cancel').on("click", function () {
-                showBookmarks();
+                showNews();
             });
 
         } else {
-            renderError("Bookmark introuvable!");
+            renderError("Nouvelle introuvable!");
         }
     } else
-        renderError(Bookmarks_API.currentHttpError);
+        renderError(News_API.currentHttpError);
 }
 function getFormData($form) {
     const removeTag = new RegExp("(<[a-zA-Z0-9]+>)|(</[a-zA-Z0-9]+>)", "g");
@@ -244,30 +244,30 @@ function getFormData($form) {
     });
     return jsonObject;
 }
-function newBookmark() {
-    Bookmark = {};
-    Bookmark.Id = 0;
-    Bookmark.Title = "";
-    Bookmark.Url = "";
-    Bookmark.Category = "";
-    return Bookmark;
+function newNews() {
+    News = {};
+    News.Id = 0;
+    News.Title = "";
+    News.Texte = "";
+    News.Category = "";
+    News.Image = "";
+    News.Creation = Date.now();
+    return News;
 }
-function renderBookmarkForm(Bookmark = null) {
-    hideBookmarks();
-    let create = Bookmark == null;
+function renderNewsForm(News = null) {
+    hideNews();
+    let create = News == null;
     let favicon = `<div class="big-favicon"></div>`;
     if (create)
-        Bookmark = newBookmark();
+        News = newNews();
     else
-        favicon = makeFavicon(Bookmark.Url, true);
+        favicon = makeFavicon(News.Url, true);
     $("#actionTitle").text(create ? "Création" : "Modification");
-    $("#bookmarkForm").show();
-    $("#bookmarkForm").empty();
-    $("#bookmarkForm").append(`
-        <form class="form" id="BookmarkForm">
-            <a href="${Bookmark.Url}" target="_blank" id="faviconLink" class="big-favicon" > ${favicon} </a>
-            <br>
-            <input type="hidden" name="Id" value="${Bookmark.Id}"/>
+    $("#newsForm").show();
+    $("#newsForm").empty();
+    $("#newsForm").append(`
+        <form class="form" id="NewsForm">
+            <input type="hidden" name="Id" value="${News.Id}"/>
 
             <label for="Title" class="form-label">Titre </label>
             <input 
@@ -278,16 +278,16 @@ function renderBookmarkForm(Bookmark = null) {
                 required
                 RequireMessage="Veuillez entrer un titre"
                 InvalidMessage="Le titre comporte un caractère illégal"
-                value="${Bookmark.Title}"
+                value="${News.Title}"
             />
-            <label for="Url" class="form-label">Url </label>
-            <input
-                class="form-control URL"
-                name="Url"
-                id="Url"
-                placeholder="Url"
+            <label for="Text" class="form-label">Texte </label>
+            <input 
+                class="form-control"
+                name="Text"
+                id="Text"
+                placeholder="Text"
                 required
-                value="${Bookmark.Url}" 
+                value="${News.Texte}"
             />
             <label for="Category" class="form-label">Catégorie </label>
             <input 
@@ -296,37 +296,42 @@ function renderBookmarkForm(Bookmark = null) {
                 id="Category"
                 placeholder="Catégorie"
                 required
-                value="${Bookmark.Category}"
+                value="${News.Category}"
+            />
+            <label for="Image" class="form-label">Image </label>
+            <input 
+                class="form-control"
+                name="Image"
+                id="Image"
+                placeholder="Image"
+                required
+                value="${News.Image}"
             />
             <br>
-            <input type="submit" value="Enregistrer" id="saveBookmark" class="btn btn-primary">
+            <input type="submit" value="Enregistrer" id="saveNews" class="btn btn-primary">
             <input type="button" value="Annuler" id="cancel" class="btn btn-secondary">
         </form>
     `);
     initFormValidation();
-    $("#Url").on("change", function () {
-        let favicon = makeFavicon($("#Url").val(), true);
-        $("#faviconLink").empty();
-        $("#faviconLink").attr("href", $("#Url").val());
-        $("#faviconLink").append(favicon);
-    })
-    $('#BookmarkForm').on("submit", async function (event) {
+    $('#NewsForm').on("submit", async function (event) {
         event.preventDefault();
-        let Bookmark = getFormData($("#BookmarkForm"));
-        Bookmark = await Bookmarks_API.Save(Bookmark, create);
-        if (!Bookmarks_API.error) {
-            showBookmarks();
+        let News = getFormData($("#NewsForm"));
+        News = await News_API.Save(News, create);
+        if (!News_API.error) {
+            showNews();
             await pageManager.update(false);
             compileCategories();
-            pageManager.scrollToElem(Bookmark.Id);
+            pageManager.scrollToElem(News.Id);
         }
         else
             renderError("Une erreur est survenue!");
     });
     $('#cancel').on("click", function () {
-        showBookmarks();
+        showNews();
     });
 }
+
+//pas utile pour le tp
 function makeFavicon(url, big = false) {
     // Utiliser l'API de google pour extraire le favicon du site pointé par url
     // retourne un élément div comportant le favicon en tant qu'image de fond
@@ -337,21 +342,21 @@ function makeFavicon(url, big = false) {
     url = "http://www.google.com/s2/favicons?sz=64&domain=" + url;
     return `<div class="${faviconClass}" style="background-image: url('${url}');"></div>`;
 }
-function renderBookmark(Bookmark) {
-    let favicon = makeFavicon(Bookmark.Url);
+function renderNews(News) {
+    let favicon = makeFavicon(News.Url);
     return $(`
-     <div class="BookmarkRow" id='${Bookmark.Id}'>
-        <div class="BookmarkContainer noselect">
-            <div class="BookmarkLayout">
-                <div class="Bookmark">
-                    <a href="${Bookmark.Url}" target="_blank"> ${favicon} </a>
-                    <span class="BookmarkTitle">${Bookmark.Title}</span>
+     <div class="NewsRow" id='${News.Id}'>
+        <div class="NewsContainer noselect">
+            <div class="NewsLayout">
+                <div class="News">
+                    <a href="${News.Url}" target="_blank"> ${favicon} </a>
+                    <span class="NewsTitle">${News.Title}</span>
                 </div>
-                <span class="BookmarkCategory">${Bookmark.Category}</span>
+                <span class="NewsCategory">${News.Category}</span>
             </div>
-            <div class="BookmarkCommandPanel">
-                <span class="editCmd cmdIcon fa fa-pencil" editBookmarkId="${Bookmark.Id}" title="Modifier ${Bookmark.Title}"></span>
-                <span class="deleteCmd cmdIcon fa fa-trash" deleteBookmarkId="${Bookmark.Id}" title="Effacer ${Bookmark.Title}"></span>
+            <div class="NewsCommandPanel">
+                <span class="editCmd cmdIcon fa fa-pencil" editNewsId="${News.Id}" title="Modifier ${News.Title}"></span>
+                <span class="deleteCmd cmdIcon fa fa-trash" deleteNewsId="${News.Id}" title="Effacer ${News.Title}"></span>
             </div>
         </div>
     </div>           

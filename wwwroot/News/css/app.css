@@ -130,7 +130,7 @@
 
 @media screen and (min-width:650px) {
 
-    .BookmarkLayout {
+    .NewsLayout {
         grid-template-columns: auto 30%;
     }
 }
@@ -171,7 +171,7 @@ a {
 
 .favicon {
     text-align: center;
-    background-image: url("../bookmark_logo.png");
+    background-image: url("../newspaper_logo.png");
     background-size: contain;
     background-repeat: no-repeat;
     height: 24px;
@@ -181,7 +181,7 @@ a {
 
 .big-favicon {
     text-align: center;
-    background-image: url("../bookmark_logo.png");
+    background-image: url("../newspaper_logo.png");
     background-size: contain;
     background-repeat: no-repeat;
     height: 48px;
