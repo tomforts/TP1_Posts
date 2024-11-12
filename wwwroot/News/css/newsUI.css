@@ -1,0 +1,96 @@
+
+<<<<<<<< HEAD:wwwroot/News/css/postsUI.css
+.PostRow {
+========
+.NewsRow {
+>>>>>>>> Luciano:wwwroot/News/css/newsUI.css
+    padding: 8px;
+    padding-bottom: 0px;
+    scroll-snap-align: start;
+}
+
+<<<<<<<< HEAD:wwwroot/News/css/postsUI.css
+.PostContainer {
+========
+.NewsContainer {
+>>>>>>>> Luciano:wwwroot/News/css/newsUI.css
+    display: grid;
+    grid-template-columns: 4fr 1fr;
+    align-items: top;
+    background-color: #eee;
+    border-radius: 6px;
+}
+
+<<<<<<<< HEAD:wwwroot/News/css/postsUI.css
+.PostContainer .cmdIcon {
+    display: none;
+}
+
+.PostContainer:hover .cmdIcon {
+    display: block;
+}
+
+.PostLayout {
+========
+.NewsContainer .cmdIcon {
+    display: none;
+}
+
+.NewsContainer:hover .cmdIcon {
+    display: block;
+}
+
+.NewsLayout {
+>>>>>>>> Luciano:wwwroot/News/css/newsUI.css
+    display: grid;
+    grid-template-columns: 1fr;
+    padding: 10px;
+    gap: 8px;
+    align-items: center;
+}
+
+<<<<<<<< HEAD:wwwroot/News/css/postsUI.css
+.Post {
+========
+.News {
+>>>>>>>> Luciano:wwwroot/News/css/newsUI.css
+    display: grid;
+    grid-template-columns: 30px auto;
+}
+
+<<<<<<<< HEAD:wwwroot/News/css/postsUI.css
+.PostTitle {
+========
+.NewsTitle {
+>>>>>>>> Luciano:wwwroot/News/css/newsUI.css
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: black;
+}
+
+<<<<<<<< HEAD:wwwroot/News/css/postsUI.css
+.PostCategory {
+    color: dodgerblue !important;
+}
+
+.PostCommandPanel {
+========
+.NewsCategory {
+    color: dodgerblue !important;
+}
+
+.NewsCommandPanel {
+>>>>>>>> Luciano:wwwroot/News/css/newsUI.css
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+<<<<<<<< HEAD:wwwroot/News/css/postsUI.css
+.PostdeleteForm {
+========
+.NewsdeleteForm {
+>>>>>>>> Luciano:wwwroot/News/css/newsUI.css
+    margin: 20px;
+}
